@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void convertToGrey(View v) throws JSONException {
 
-        Mat rgpa = new Mat();
+        Mat originalImage = new Mat();
         Mat greyMat = new Mat();
         Mat edgeMat = new Mat();
 
@@ -139,11 +140,108 @@ public class MainActivity extends AppCompatActivity {
         o.inDither = false;
         o.inSampleSize = 4;
 
-        Utils.bitmapToMat(initialImageBitmap, rgpa);
+        Utils.bitmapToMat(initialImageBitmap, originalImage);
+        Mat doorTemp = originalImage;
+        Mat wallTemp = originalImage;
+        Mat windowTemp = originalImage;
 
+
+//        //Logic Start Here
+//        Imgproc.cvtColor(rgpa, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
+//        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
+//        // Probabilistic Line Transform
+//        Mat linesP = new Mat(); // will hold the results of the detection
+//        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
+//
+//        double[] data;
+//        Point pt1 = new Point();
+//        Point pt2 = new Point();
+//
+//        JSONObject imageData = new JSONObject();
+//        JSONArray wallArray = new JSONArray();
+//
+//        for (int i = 0; i < linesP.rows(); i++) {
+//
+//            JSONObject wall = new JSONObject();
+//            data = linesP.get(i, 0);
+//            pt1.x = data[0];
+//            pt1.y = data[1];
+//            pt2.x = data[2];
+//            pt2.y = data[3];
+//            Imgproc.line(rgpa, pt1, pt2, new Scalar(0, 0, 200), 3);
+//            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
+//
+//            wall.put("StartingPoint", pt1.x + "," + pt1.y);
+//            wall.put("EndingPoint", pt2.x + "," + pt2.y);
+//            wall.put("AngleInRadian", angle);
+//
+//            wallArray.put(wall);
+//        }
+
+        JSONObject imageData = new JSONObject();
+        JSONArray wallArray = wallDetection(originalImage);
+        JSONArray doorArray = doorDetection(originalImage);
+        JSONArray windowArray = windowDetection(originalImage);
+
+        imageData.put("Walls", wallArray);
+        imageData.put("Doors", doorArray);
+        imageData.put("Windows", windowArray);
+
+        String jsonString = imageData.toString();
+        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
+        Log.d("STATE", jsonString);
+
+//        Toast.makeText(this, jsonString, Toast.LENGTH_LONG).show();
+
+//        Intent intent = new Intent(Intent.ACTION_SEND);
+//        intent.setType("text/html");
+//        intent.putExtra(Intent.EXTRA_EMAIL, "emailaddress@emailaddress.com");
+//        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+//        intent.putExtra(Intent.EXTRA_TEXT, jsonString);
+//
+//        startActivity(Intent.createChooser(intent, "Send Email"));
+
+        //Logic End Here
+
+        int height = initialImageBitmap.getWidth();
+        int witdh = initialImageBitmap.getHeight();
+
+        resultBitmap = Bitmap.createBitmap(height, witdh, Bitmap.Config.RGB_565);
+
+        Utils.matToBitmap(originalImage, resultBitmap);
+
+        imageView.setImageBitmap(resultBitmap);
+    }
+
+    //-----------------------//
+
+    public JSONArray wallDetection(Mat originalImage) throws JSONException {
+
+        Mat greyMat = new Mat();
+        Mat edgeMat = new Mat();
+
+        Mat roiTmp = originalImage.clone();
+        Log.e("bitmapWidth", String.valueOf(originalImage.width()));
+        final Mat hsvMat = new Mat();
+        originalImage.copyTo(hsvMat);
+
+        // convert mat to HSV format for Core.inRange()
+        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
+
+
+
+        Scalar lowerTestingColor = new Scalar(0, 0, 0); //Grey
+        Scalar upperTestingColor = new Scalar(180, 255, 130);
+
+
+
+        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
+
+        Mat cropped = new Mat();
+        originalImage.copyTo( cropped, roiTmp );
 
         //Logic Start Here
-        Imgproc.cvtColor(rgpa, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
+        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
         Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
         // Probabilistic Line Transform
         Mat linesP = new Mat(); // will hold the results of the detection
@@ -153,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         Point pt1 = new Point();
         Point pt2 = new Point();
 
-        JSONObject imageData = new JSONObject();
+//        JSONObject imageData = new JSONObject();
         JSONArray wallArray = new JSONArray();
 
         for (int i = 0; i < linesP.rows(); i++) {
@@ -164,35 +262,167 @@ public class MainActivity extends AppCompatActivity {
             pt1.y = data[1];
             pt2.x = data[2];
             pt2.y = data[3];
-            Imgproc.line(rgpa, pt1, pt2, new Scalar(0, 0, 200), 3);
+            Imgproc.line(originalImage, pt1, pt2, new Scalar(255, 0, 0), 3);
             float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
 
             wall.put("StartingPoint", pt1.x + "," + pt1.y);
             wall.put("EndingPoint", pt2.x + "," + pt2.y);
             wall.put("AngleInRadian", angle);
 
+
+
+
             wallArray.put(wall);
         }
 
-        imageData.put("Walls", wallArray);
+//        imageData.put("Walls", wallArray);
 
-        String jsonString = imageData.toString();
-        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-        Log.d("STATE", jsonString);
-
-        //Logic End Here
-
-        int height = initialImageBitmap.getWidth();
-        int witdh = initialImageBitmap.getHeight();
-
-        resultBitmap = Bitmap.createBitmap(height, witdh, Bitmap.Config.RGB_565);
-
-        Utils.matToBitmap(rgpa, resultBitmap);
-
-        imageView.setImageBitmap(resultBitmap);
+//        String jsonString = imageData.toString();
+//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
+//        Log.d("STATE", jsonString);
+        Log.d("Walls detected:   ", wallArray.toString());
+        return wallArray;
     }
 
-    //-----------------------//
+    public JSONArray doorDetection(Mat originalImage) throws JSONException {
+
+        Mat greyMat = new Mat();
+        Mat edgeMat = new Mat();
+
+        Mat roiTmp = originalImage.clone();
+        Log.e("bitmapWidth", String.valueOf(originalImage.width()));
+        final Mat hsvMat = new Mat();
+        originalImage.copyTo(hsvMat);
+
+        // convert mat to HSV format for Core.inRange()
+        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
+
+
+
+        Scalar lowerTestingColor = new Scalar(160, 150, 20); //Dark Red
+        Scalar upperTestingColor = new Scalar(180, 255, 255);
+
+
+
+        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
+
+        Mat cropped = new Mat();
+        originalImage.copyTo( cropped, roiTmp );
+
+        //Logic Start Here
+        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
+        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
+        // Probabilistic Line Transform
+        Mat linesP = new Mat(); // will hold the results of the detection
+        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
+
+        double[] data;
+        Point pt1 = new Point();
+        Point pt2 = new Point();
+
+//        JSONObject imageData = new JSONObject();
+        JSONArray doorArray = new JSONArray();
+
+        for (int i = 0; i < linesP.rows(); i++) {
+
+            JSONObject door = new JSONObject();
+            data = linesP.get(i, 0);
+            pt1.x = data[0];
+            pt1.y = data[1];
+            pt2.x = data[2];
+            pt2.y = data[3];
+            Imgproc.line(originalImage, pt1, pt2, new Scalar(0, 255, 0), 3);
+            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
+
+            door.put("StartingPoint", pt1.x + "," + pt1.y);
+            door.put("EndingPoint", pt2.x + "," + pt2.y);
+            door.put("AngleInRadian", angle);
+
+
+
+
+            doorArray.put(door);
+        }
+
+//        imageData.put("Walls", wallArray);
+
+//        String jsonString = imageData.toString();
+//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
+//        Log.d("STATE", jsonString);
+
+        Log.d("Doors detected:   ", doorArray.toString());
+        return doorArray;
+    }
+
+    public JSONArray windowDetection(Mat originalImage) throws JSONException {
+
+        Mat greyMat = new Mat();
+        Mat edgeMat = new Mat();
+
+        Mat roiTmp = originalImage.clone();
+        Log.e("bitmapWidth", String.valueOf(originalImage.width()));
+        final Mat hsvMat = new Mat();
+        originalImage.copyTo(hsvMat);
+
+        // convert mat to HSV format for Core.inRange()
+        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
+
+
+
+        Scalar lowerTestingColor = new Scalar(25, 100, 20);  //Yellow
+        Scalar upperTestingColor = new Scalar(35, 255, 255);
+
+
+        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
+
+        Mat cropped = new Mat();
+        originalImage.copyTo( cropped, roiTmp );
+
+        //Logic Start Here
+        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
+        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
+        // Probabilistic Line Transform
+        Mat linesP = new Mat(); // will hold the results of the detection
+        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
+
+        double[] data;
+        Point pt1 = new Point();
+        Point pt2 = new Point();
+
+//        JSONObject imageData = new JSONObject();
+        JSONArray windowArray = new JSONArray();
+
+        for (int i = 0; i < linesP.rows(); i++) {
+
+            JSONObject window = new JSONObject();
+            data = linesP.get(i, 0);
+            pt1.x = data[0];
+            pt1.y = data[1];
+            pt2.x = data[2];
+            pt2.y = data[3];
+            Imgproc.line(originalImage, pt1, pt2, new Scalar(0, 0, 255), 3);
+            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
+
+            window.put("StartingPoint", pt1.x + "," + pt1.y);
+            window.put("EndingPoint", pt2.x + "," + pt2.y);
+            window.put("AngleInRadian", angle);
+
+
+
+
+            windowArray.put(window);
+        }
+
+//        imageData.put("Walls", wallArray);
+
+//        String jsonString = imageData.toString();
+//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
+//        Log.d("STATE", jsonString);
+        Log.d("Windows detected:   ", windowArray.toString());
+        return windowArray;
+    }
+
+
 
     public void TextDetection(View v) throws JSONException {
 
@@ -314,5 +544,105 @@ public class MainActivity extends AppCompatActivity {
 //                new Scalar(0, 0, 0), 2, 8, 0);
 
 //        imageView.setImageBitmap(bitmap);
+    }
+
+
+    public void detectColorLines(View v) throws JSONException {
+
+        Mat rgpa = new Mat();
+        Mat greyMat = new Mat();
+        Mat edgeMat = new Mat();
+
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inDither = false;
+        o.inSampleSize = 4;
+
+        Utils.bitmapToMat(initialImageBitmap, rgpa);
+
+
+
+        Mat roiTmp = rgpa.clone();
+        Log.e("bitmapWidth", String.valueOf(rgpa.width()));
+        final Mat hsvMat = new Mat();
+        rgpa.copyTo(hsvMat);
+
+        // convert mat to HSV format for Core.inRange()
+        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
+
+        Scalar lowerb = new Scalar(85, 50, 40);         // lower color border for BLUE
+        Scalar upperb = new Scalar(135, 255, 255);      // upper color border for BLUE
+
+        Scalar lowerblack = new Scalar(0, 0, 0);         // lower color border for BLACK
+        Scalar upperblack = new Scalar(180, 255, 40);      // upper color border for BLACK
+
+        Scalar testRunL = new Scalar(60, 50, 40); // lower Green   83 100 51
+        Scalar testRunU = new Scalar(90, 255, 255); // upper Green
+
+//        Scalar lowerTestingColor = new Scalar(160, 150, 20); //Dark Red
+//        Scalar upperTestingColor = new Scalar(180, 255, 255);
+
+        Scalar lowerTestingColor = new Scalar(0, 0, 0); //Grey
+        Scalar upperTestingColor = new Scalar(180, 255, 130);
+
+//        Scalar lowerTestingColor = new Scalar(25, 100, 20);  //Yellow
+//        Scalar upperTestingColor = new Scalar(35, 255, 255);
+
+
+        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
+
+        Mat cropped = new Mat();
+        rgpa.copyTo( cropped, roiTmp );
+
+        //Logic Start Here
+        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
+        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
+        // Probabilistic Line Transform
+        Mat linesP = new Mat(); // will hold the results of the detection
+        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
+
+        double[] data;
+        Point pt1 = new Point();
+        Point pt2 = new Point();
+
+        JSONObject imageData = new JSONObject();
+        JSONArray wallArray = new JSONArray();
+
+        for (int i = 0; i < linesP.rows(); i++) {
+
+            JSONObject wall = new JSONObject();
+            data = linesP.get(i, 0);
+            pt1.x = data[0];
+            pt1.y = data[1];
+            pt2.x = data[2];
+            pt2.y = data[3];
+            Imgproc.line(rgpa, pt1, pt2, new Scalar(0, 255, 0), 3);
+            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
+
+            wall.put("StartingPoint", pt1.x + "," + pt1.y);
+            wall.put("EndingPoint", pt2.x + "," + pt2.y);
+            wall.put("AngleInRadian", angle);
+
+            Log.d("Walls detected:   ", wall.toString());
+
+
+            wallArray.put(wall);
+        }
+
+        imageData.put("Walls", wallArray);
+
+        String jsonString = imageData.toString();
+        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
+        Log.d("STATE", jsonString);
+
+        //Logic End Here
+
+        int height = initialImageBitmap.getWidth();
+        int witdh = initialImageBitmap.getHeight();
+
+        resultBitmap = Bitmap.createBitmap(height, witdh, Bitmap.Config.RGB_565);
+
+        Utils.matToBitmap(rgpa, resultBitmap);
+
+        imageView.setImageBitmap(resultBitmap);
     }
 }
