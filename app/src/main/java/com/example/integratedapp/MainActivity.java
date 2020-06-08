@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.atan2;
+import static java.lang.Math.sqrt;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 //        Intent intent = new Intent(Intent.ACTION_SEND);
 //        intent.setType("text/html");
 //        intent.putExtra(Intent.EXTRA_EMAIL, "emailaddress@emailaddress.com");
-//        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+//        intent.putExtra(Intent.EXTRA_SUBJECT, "Test Data");
 //        intent.putExtra(Intent.EXTRA_TEXT, jsonString);
 //
 //        startActivity(Intent.createChooser(intent, "Send Email"));
@@ -265,9 +266,12 @@ public class MainActivity extends AppCompatActivity {
             Imgproc.line(originalImage, pt1, pt2, new Scalar(255, 0, 0), 3);
             float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
 
+            double wallLength = getLinesLength(pt1, pt2);
+
             wall.put("StartingPoint", pt1.x + "," + pt1.y);
             wall.put("EndingPoint", pt2.x + "," + pt2.y);
             wall.put("AngleInRadian", angle);
+            wall.put("Length", wallLength);
 
 
 
@@ -283,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Walls detected:   ", wallArray.toString());
         return wallArray;
     }
+
+
 
     public JSONArray doorDetection(Mat originalImage) throws JSONException {
 
@@ -334,10 +340,12 @@ public class MainActivity extends AppCompatActivity {
             Imgproc.line(originalImage, pt1, pt2, new Scalar(0, 255, 0), 3);
             float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
 
+            double doorLength = getLinesLength(pt1, pt2);
+
             door.put("StartingPoint", pt1.x + "," + pt1.y);
             door.put("EndingPoint", pt2.x + "," + pt2.y);
             door.put("AngleInRadian", angle);
-
+            door.put("Length", doorLength);
 
 
 
@@ -403,10 +411,12 @@ public class MainActivity extends AppCompatActivity {
             Imgproc.line(originalImage, pt1, pt2, new Scalar(0, 0, 255), 3);
             float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
 
+            double windowLength = getLinesLength(pt1, pt2);
+
             window.put("StartingPoint", pt1.x + "," + pt1.y);
             window.put("EndingPoint", pt2.x + "," + pt2.y);
             window.put("AngleInRadian", angle);
-
+            window.put("Length", windowLength);
 
 
 
@@ -420,6 +430,22 @@ public class MainActivity extends AppCompatActivity {
 //        Log.d("STATE", jsonString);
         Log.d("Windows detected:   ", windowArray.toString());
         return windowArray;
+    }
+
+    public double getLinesLength(Point P1, Point P2){
+
+        double xDifference = P1.x - P2.x;
+        double yDifference = P1.y - P2.y;
+
+        double sqrX = Math.pow(xDifference, 2);
+        double sqrY = Math.pow(yDifference, 2);
+
+        double preResult = sqrX + sqrY;
+
+        double result = sqrt(preResult);
+
+        return result;
+
     }
 
 
