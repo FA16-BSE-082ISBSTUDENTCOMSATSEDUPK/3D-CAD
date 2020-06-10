@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IntegratedApp</string>
+    <string name="app_name">3D CAD</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_unity_call_middle_man">UnityCallMiddleMan</string>
 </resources>

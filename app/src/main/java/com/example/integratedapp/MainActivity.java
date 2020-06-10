@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
         Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
         // Probabilistic Line Transform
         Mat linesP = new Mat(); // will hold the results of the detection
-        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
+        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 50, 10, 10);
 
         double[] data;
         Point pt1 = new Point();
@@ -462,7 +462,7 @@ public class MainActivity extends AppCompatActivity {
 
         Utils.bitmapToMat(initialImageBitmap, image_mat);
 
-        Bitmap template_initial_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.characters_template);
+        Bitmap template_initial_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_banner);
 
 
         Utils.bitmapToMat(template_initial_bitmap, template_mat);
