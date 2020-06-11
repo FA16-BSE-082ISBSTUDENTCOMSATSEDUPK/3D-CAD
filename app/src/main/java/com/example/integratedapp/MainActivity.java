@@ -51,7 +51,7 @@ import static java.lang.Math.sqrt;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button middle_activity;
+    private Button openModelBtn, dummyModelBtn, loadModelBtn;
 
     //-----------------------//
     ImageView imageView;
@@ -67,14 +67,36 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        middle_activity = findViewById(R.id.middle_activity);
-        middle_activity.setOnClickListener(new View.OnClickListener() {
+        openModelBtn = findViewById(R.id.open_model_btn);
+        openModelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        dummyModelBtn = findViewById(R.id.dummy_model_btn);
+        dummyModelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, UnityCallMiddleMan.class);
                 startActivity(intent);
             }
         });
+
+        loadModelBtn = findViewById(R.id.load_model_btn);
+        loadModelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
 
         //--------------------------------------------------Tahir's Code
         imageView = (ImageView) findViewById(R.id.imageView2);
