@@ -106,30 +106,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 
-    //-----------------------//Tahir's Code
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -153,11 +153,9 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(gallery, 100);
     }
 
-    public void convertToGrey(View v) throws JSONException {
+    public void getFeatures(View v) throws JSONException {
 
         Mat originalImage = new Mat();
-        Mat greyMat = new Mat();
-        Mat edgeMat = new Mat();
 
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inDither = false;
@@ -202,9 +200,9 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         JSONObject imageData = new JSONObject();
-        JSONArray wallArray = wallDetection(originalImage);
-        JSONArray doorArray = doorDetection(originalImage);
-        JSONArray windowArray = windowDetection(originalImage);
+        JSONArray wallArray = Walls.wallDetection(originalImage);
+        JSONArray doorArray = Doors.doorDetection(originalImage);
+        JSONArray windowArray = Windows.windowDetection(originalImage);
 
         imageData.put("Walls", wallArray);
         imageData.put("Doors", doorArray);
@@ -238,237 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
     //-----------------------//
 
-    public JSONArray wallDetection(Mat originalImage) throws JSONException {
 
-        Mat greyMat = new Mat();
-        Mat edgeMat = new Mat();
-
-        Mat roiTmp = originalImage.clone();
-        Log.e("bitmapWidth", String.valueOf(originalImage.width()));
-        final Mat hsvMat = new Mat();
-        originalImage.copyTo(hsvMat);
-
-        // convert mat to HSV format for Core.inRange()
-        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
-
-
-
-        Scalar lowerTestingColor = new Scalar(0, 0, 0); //Grey
-        Scalar upperTestingColor = new Scalar(180, 255, 130);
-
-
-
-        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
-
-        Mat cropped = new Mat();
-        originalImage.copyTo( cropped, roiTmp );
-
-        //Logic Start Here
-        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
-        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
-        // Probabilistic Line Transform
-        Mat linesP = new Mat(); // will hold the results of the detection
-        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 50, 10, 10);
-
-        double[] data;
-        Point pt1 = new Point();
-        Point pt2 = new Point();
-
-//        JSONObject imageData = new JSONObject();
-        JSONArray wallArray = new JSONArray();
-
-        for (int i = 0; i < linesP.rows(); i++) {
-
-            JSONObject wall = new JSONObject();
-            data = linesP.get(i, 0);
-            pt1.x = data[0];
-            pt1.y = data[1];
-            pt2.x = data[2];
-            pt2.y = data[3];
-            Imgproc.line(originalImage, pt1, pt2, new Scalar(255, 0, 0), 3);
-            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
-
-            double wallLength = getLinesLength(pt1, pt2);
-
-            wall.put("StartingPoint", pt1.x + "," + pt1.y);
-            wall.put("EndingPoint", pt2.x + "," + pt2.y);
-            wall.put("AngleInRadian", angle);
-            wall.put("Length", wallLength);
-
-
-
-
-            wallArray.put(wall);
-        }
-
-//        imageData.put("Walls", wallArray);
-
-//        String jsonString = imageData.toString();
-//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-//        Log.d("STATE", jsonString);
-        Log.d("Walls detected:   ", wallArray.toString());
-        return wallArray;
-    }
-
-
-
-    public JSONArray doorDetection(Mat originalImage) throws JSONException {
-
-        Mat greyMat = new Mat();
-        Mat edgeMat = new Mat();
-
-        Mat roiTmp = originalImage.clone();
-        Log.e("bitmapWidth", String.valueOf(originalImage.width()));
-        final Mat hsvMat = new Mat();
-        originalImage.copyTo(hsvMat);
-
-        // convert mat to HSV format for Core.inRange()
-        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
-
-
-
-        Scalar lowerTestingColor = new Scalar(160, 150, 20); //Dark Red
-        Scalar upperTestingColor = new Scalar(180, 255, 255);
-
-
-
-        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
-
-        Mat cropped = new Mat();
-        originalImage.copyTo( cropped, roiTmp );
-
-        //Logic Start Here
-        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
-        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
-        // Probabilistic Line Transform
-        Mat linesP = new Mat(); // will hold the results of the detection
-        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
-
-        double[] data;
-        Point pt1 = new Point();
-        Point pt2 = new Point();
-
-//        JSONObject imageData = new JSONObject();
-        JSONArray doorArray = new JSONArray();
-
-        for (int i = 0; i < linesP.rows(); i++) {
-
-            JSONObject door = new JSONObject();
-            data = linesP.get(i, 0);
-            pt1.x = data[0];
-            pt1.y = data[1];
-            pt2.x = data[2];
-            pt2.y = data[3];
-            Imgproc.line(originalImage, pt1, pt2, new Scalar(0, 255, 0), 3);
-            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
-
-            double doorLength = getLinesLength(pt1, pt2);
-
-            door.put("StartingPoint", pt1.x + "," + pt1.y);
-            door.put("EndingPoint", pt2.x + "," + pt2.y);
-            door.put("AngleInRadian", angle);
-            door.put("Length", doorLength);
-
-
-
-            doorArray.put(door);
-        }
-
-//        imageData.put("Walls", wallArray);
-
-//        String jsonString = imageData.toString();
-//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-//        Log.d("STATE", jsonString);
-
-        Log.d("Doors detected:   ", doorArray.toString());
-        return doorArray;
-    }
-
-    public JSONArray windowDetection(Mat originalImage) throws JSONException {
-
-        Mat greyMat = new Mat();
-        Mat edgeMat = new Mat();
-
-        Mat roiTmp = originalImage.clone();
-        Log.e("bitmapWidth", String.valueOf(originalImage.width()));
-        final Mat hsvMat = new Mat();
-        originalImage.copyTo(hsvMat);
-
-        // convert mat to HSV format for Core.inRange()
-        Imgproc.cvtColor(hsvMat, hsvMat, Imgproc.COLOR_RGB2HSV);
-
-
-
-        Scalar lowerTestingColor = new Scalar(25, 100, 20);  //Yellow
-        Scalar upperTestingColor = new Scalar(35, 255, 255);
-
-
-        Core.inRange(hsvMat, lowerTestingColor, upperTestingColor, roiTmp);   // select only blue pixels
-
-        Mat cropped = new Mat();
-        originalImage.copyTo( cropped, roiTmp );
-
-        //Logic Start Here
-        Imgproc.cvtColor(cropped, greyMat, Imgproc.COLOR_BGR2GRAY); // Color Inversion
-        Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
-        // Probabilistic Line Transform
-        Mat linesP = new Mat(); // will hold the results of the detection
-        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 30, 10, 10);
-
-        double[] data;
-        Point pt1 = new Point();
-        Point pt2 = new Point();
-
-//        JSONObject imageData = new JSONObject();
-        JSONArray windowArray = new JSONArray();
-
-        for (int i = 0; i < linesP.rows(); i++) {
-
-            JSONObject window = new JSONObject();
-            data = linesP.get(i, 0);
-            pt1.x = data[0];
-            pt1.y = data[1];
-            pt2.x = data[2];
-            pt2.y = data[3];
-            Imgproc.line(originalImage, pt1, pt2, new Scalar(0, 0, 255), 3);
-            float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
-
-            double windowLength = getLinesLength(pt1, pt2);
-
-            window.put("StartingPoint", pt1.x + "," + pt1.y);
-            window.put("EndingPoint", pt2.x + "," + pt2.y);
-            window.put("AngleInRadian", angle);
-            window.put("Length", windowLength);
-
-
-
-            windowArray.put(window);
-        }
-
-//        imageData.put("Walls", wallArray);
-
-//        String jsonString = imageData.toString();
-//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-//        Log.d("STATE", jsonString);
-        Log.d("Windows detected:   ", windowArray.toString());
-        return windowArray;
-    }
-
-    public double getLinesLength(Point P1, Point P2){
-
-        double xDifference = P1.x - P2.x;
-        double yDifference = P1.y - P2.y;
-
-        double sqrX = Math.pow(xDifference, 2);
-        double sqrY = Math.pow(yDifference, 2);
-
-        double preResult = sqrX + sqrY;
-
-        double result = sqrt(preResult);
-
-        return result;
-
-    }
 
 
 
