@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     Uri imageUri;
     Bitmap resultBitmap, initialImageBitmap;
+
+    JSONObject imageData;
     //-----------------------//
 
     @Override
@@ -71,6 +73,17 @@ public class MainActivity extends AppCompatActivity {
         openModelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(!checks.checkDataIsNotEmpty(imageData)){
+                    Toast.makeText(MainActivity.this, "Data is not present", Toast.LENGTH_LONG).show();
+                    return;
+                };
+
+                if(!checks.checkDataIsNotValid(imageData)){
+                    Toast.makeText(MainActivity.this, "Data is not valid", Toast.LENGTH_LONG).show();
+                    return;
+                };
+
                 Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
                 startActivity(intent);
             }
@@ -161,10 +174,14 @@ public class MainActivity extends AppCompatActivity {
         o.inDither = false;
         o.inSampleSize = 4;
 
+        if(!checks.checkInputImage(initialImageBitmap)){
+
+            Toast.makeText(this, "Image not selected", Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
         Utils.bitmapToMat(initialImageBitmap, originalImage);
-        Mat doorTemp = originalImage;
-        Mat wallTemp = originalImage;
-        Mat windowTemp = originalImage;
 
 
 //        //Logic Start Here
@@ -199,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
 //            wallArray.put(wall);
 //        }
 
-        JSONObject imageData = new JSONObject();
+        imageData = new JSONObject();
         JSONArray wallArray = Walls.wallDetection(originalImage);
         JSONArray doorArray = Doors.doorDetection(originalImage);
         JSONArray windowArray = Windows.windowDetection(originalImage);
@@ -207,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
         imageData.put("Walls", wallArray);
         imageData.put("Doors", doorArray);
         imageData.put("Windows", windowArray);
+
+
 
         String jsonString = imageData.toString();
         UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
