@@ -26,7 +26,13 @@
         android:onClick="openGallery"
         android:text="Gallery"
          />
-
+    <Button
+        android:id="@+id/capture_img_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Capture Image"
+        />
     <Button
         android:id="@+id/dummy_model_btn"
         android:layout_width="match_parent"
@@ -78,6 +84,7 @@
         android:onClick="TextDetection"
         android:text="Template"
          />
+
 
 
 

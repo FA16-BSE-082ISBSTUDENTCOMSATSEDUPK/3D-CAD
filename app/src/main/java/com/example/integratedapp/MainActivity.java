@@ -1,6 +1,9 @@
 package com.example.integratedapp;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -9,6 +12,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -51,7 +55,10 @@ import static java.lang.Math.sqrt;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button openModelBtn, dummyModelBtn, loadModelBtn;
+    private static final int CAMERA_REQUEST = 1888;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+
+    private Button openModelBtn, dummyModelBtn, loadModelBtn, captureImgBtn;
 
     //-----------------------//
     ImageView imageView;
@@ -107,7 +114,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        captureImgBtn = findViewById(R.id.capture_img_btn);
+        captureImgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+                }
+                else
+                {
+                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                }
+            }
+        });
 
 
 
@@ -142,6 +163,39 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
 
+    //Capture Functionality start
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+//    {
+//        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+//        {
+//            Bitmap photo = (Bitmap) data.getExtras().get("data");
+//            imageView.setImageBitmap(photo);
+//        }
+//    }
+
+    //Capture Funtionality end
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -158,6 +212,13 @@ public class MainActivity extends AppCompatActivity {
 
             imageView.setImageBitmap(initialImageBitmap);
 
+        }
+
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+        {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            initialImageBitmap = photo;
+            imageView.setImageBitmap(photo);
         }
     }
 
@@ -480,4 +541,7 @@ public class MainActivity extends AppCompatActivity {
 
         imageView.setImageBitmap(resultBitmap);
     }
+
+
+
 }
