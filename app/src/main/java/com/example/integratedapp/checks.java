@@ -22,12 +22,12 @@ public class checks {
             return true;
     }
 
-    public static boolean checkDataIsNotValid(JSONObject imageData){
-        if(imageData == null)
-            return false;
-        else
-            return true;
-    }
+//    public static boolean checkDataIsNotValid(JSONObject imageData){
+//        if(imageData == null)
+//            return false;
+//        else
+//            return true;
+//    }
 
 }
 

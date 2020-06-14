@@ -76,11 +76,6 @@ public class Windows {
             windowArray.put(window);
         }
 
-//        imageData.put("Walls", wallArray);
-
-//        String jsonString = imageData.toString();
-//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-//        Log.d("STATE", jsonString);
         Log.d("Windows detected:   ", windowArray.toString());
         return windowArray;
     }

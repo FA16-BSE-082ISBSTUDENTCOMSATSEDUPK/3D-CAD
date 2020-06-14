@@ -79,11 +79,6 @@ public class Walls {
             wallArray.put(wall);
         }
 
-//        imageData.put("Walls", wallArray);
-
-//        String jsonString = imageData.toString();
-//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-//        Log.d("STATE", jsonString);
         Log.d("Walls detected:   ", wallArray.toString());
         return wallArray;
     }

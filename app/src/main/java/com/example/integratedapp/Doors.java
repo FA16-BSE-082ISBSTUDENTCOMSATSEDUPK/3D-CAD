@@ -77,11 +77,6 @@ public class Doors {
             doorArray.put(door);
         }
 
-//        imageData.put("Walls", wallArray);
-
-//        String jsonString = imageData.toString();
-//        UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
-//        Log.d("STATE", jsonString);
 
         Log.d("Doors detected:   ", doorArray.toString());
         return doorArray;

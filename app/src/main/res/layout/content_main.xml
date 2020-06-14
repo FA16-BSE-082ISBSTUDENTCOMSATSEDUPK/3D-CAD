@@ -33,13 +33,7 @@
         android:layout_marginTop="10dp"
         android:text="Capture Image"
         />
-    <Button
-        android:id="@+id/dummy_model_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Dummy model"
-        />
+
 
     <Button
         android:id="@+id/button2"
@@ -67,23 +61,7 @@
 
 
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:onClick="detectColorLines"
-        android:text="Detect Color"
-         />
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:onClick="TextDetection"
-        android:text="Template"
-         />
 
 
 
