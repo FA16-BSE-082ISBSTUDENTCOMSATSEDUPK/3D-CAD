@@ -86,10 +86,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 };
 
-//                if(!checks.checkDataIsNotValid(imageData)){
-//                    Toast.makeText(MainActivity.this, "Data is not valid", Toast.LENGTH_LONG).show();
-//                    return;
-//                };
+
+
 
                 Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
                 startActivity(intent);
@@ -188,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void getFeatures(View v) throws JSONException {
 
+
+
         Mat originalImage = new Mat();
 
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
         String jsonString = imageData.toString();
         UnityCallBack.getInstance().setJsonString(jsonString);//Sending the json string to unitycallback
         Log.d("STATE", jsonString);
-
 
 
         int height = initialImageBitmap.getWidth();

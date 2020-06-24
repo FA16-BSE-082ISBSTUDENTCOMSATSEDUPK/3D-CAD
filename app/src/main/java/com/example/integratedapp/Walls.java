@@ -15,6 +15,8 @@ import static java.lang.Math.atan2;
 
 public class Walls {
 
+
+
     public static JSONArray wallDetection(Mat originalImage) throws JSONException {
 
         Mat greyMat = new Mat();
@@ -45,7 +47,7 @@ public class Walls {
         Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
         // Probabilistic Line Transform
         Mat linesP = new Mat(); // will hold the results of the detection
-        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 50, 10, 10);
+        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 20, 10, 10);
 
         double[] data;
         Point pt1 = new Point();
@@ -72,9 +74,6 @@ public class Walls {
             wall.put("EndingPoint", pt2.x + "," + pt2.y);
             wall.put("AngleInRadian", angle);
             wall.put("Length", wallLength);
-
-
-
 
             wallArray.put(wall);
         }

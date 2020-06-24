@@ -14,59 +14,55 @@
         android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="330dp"
-
+        android:layout_marginTop="60dp"
         app:srcCompat="@drawable/grid_background" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:onClick="openGallery"
-        android:text="Gallery"
+        android:background="@drawable/gallery_button"
          />
     <Button
         android:id="@+id/capture_img_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
         android:layout_marginTop="10dp"
-        android:text="Capture Image"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/image_capture_button"
         />
 
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
         android:layout_marginTop="10dp"
-
+        android:layout_gravity="center_horizontal"
         android:onClick="getFeatures"
-        android:text="Action" />
+        android:background="@drawable/action_button"
+        />
+
     <Button
         android:id="@+id/open_model_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
         android:layout_marginTop="10dp"
-        android:text="Create 3D Model"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/model3d_button"
          />
 
     <Button
         android:id="@+id/load_model_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Load Model"
+        android:layout_width="320dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
+        android:background="@drawable/load_button"
         />
-
-
-
-
-
-
-
-
-
 
 
 
