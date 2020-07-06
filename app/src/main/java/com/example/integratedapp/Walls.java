@@ -11,13 +11,25 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
+
 import static java.lang.Math.atan2;
 
 public class Walls {
 
 
-
     public static JSONArray wallDetection(Mat originalImage) throws JSONException {
+
+        //Fields to reduce redundency
+        Point oldStartingPoint = new Point(0,0);
+        Point oldEndingPoint = new Point(0, 0);
+        float oldAngle = (float) 0.00;
+        double oldLength = 0.0;
+//        ArrayList<Point> oldStartingPointArray = new ArrayList<Point>();
+//        ArrayList<Point> oldEndingPointArray = new ArrayList<Point>();
+//        ArrayList<Float> oldAngleArray = new ArrayList<Float>();
+//        ArrayList<Double> oldLengthArray = new ArrayList<Double>();
+
 
         Mat greyMat = new Mat();
         Mat edgeMat = new Mat();
@@ -68,6 +80,99 @@ public class Walls {
             float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
 
             double wallLength = GetingMeasurements.getLinesLength(pt1, pt2);
+
+            //Check and remove Redundency start
+
+            if(checks.similarPoints(oldStartingPoint, pt1)){
+                if(checks.similarPoints(oldEndingPoint, pt2)){
+                    if(checks.similarAngles(oldAngle, angle)){
+                        if(checks.similarLength(oldLength, wallLength)){
+                            //Do whatever if walls are similar
+
+                            Log.d("Testing Redundent:   ", "True" );
+                            //Update Old values to New Values
+                            oldStartingPoint = pt1;
+                            oldEndingPoint = pt2;
+                            oldAngle = angle;
+                            oldLength = wallLength;
+
+//                            i++;
+//                            continue;
+
+
+                        }
+                    }
+                }
+            };
+
+            //Update Old values to New Values
+            oldStartingPoint = pt1;
+            oldEndingPoint = pt2;
+            oldAngle = angle;
+            oldLength = wallLength;
+
+            //End
+
+
+
+//            //Check for redundency Start
+//
+//
+//
+//            if(i!=0) {
+//
+//
+//
+//                Log.d("Testing IIIIIIII:   ", String.valueOf(i));
+//                Boolean check = false;
+//                for (int j = 0; j < oldStartingPointArray.size(); j++) {
+//
+//
+//
+//
+//                    oldStartingPoint =oldStartingPointArray.get(j);
+//                    oldEndingPoint = oldEndingPointArray.get(j);
+//
+//                    oldAngle = oldAngleArray.get(j);
+//                    oldLength = oldLengthArray.get(j);
+//
+//                    Log.d("Testing Cast:   ", String.valueOf(oldLength));
+//
+//                    if (checks.similarPoints(oldStartingPoint, pt1)) {
+//                        if (checks.similarPoints(oldEndingPoint, pt2)) {
+//                            if (checks.similarAngles(oldAngle, angle)) {
+//                                if (checks.similarLength(oldLength, wallLength)) {
+//                                    //Do whatever if walls are similar
+//
+//                                    Log.d("Testing Redundent III:", String.valueOf(i));
+//                                    Log.d("Testing Redundent JJJ:", String.valueOf(j));
+//                                    //Update Old values to New Values
+//
+//                                    check = true;
+//                                    break;
+//
+//
+//                                }
+//                            }
+//                        }
+//                    }
+//                    ;
+//                }
+//
+//                if (check) {
+//                    i++;
+//                    continue;
+//                }
+//
+//            }
+//            //Update Old values to New Values
+//
+//
+//            oldStartingPointArray.add(pt1);
+//            oldEndingPointArray.add(pt2);
+//            oldAngleArray.add(angle);
+//            oldLengthArray.add(wallLength);
+//            //End
 
 
             wall.put("StartingPoint", pt1.x + "," + pt1.y);

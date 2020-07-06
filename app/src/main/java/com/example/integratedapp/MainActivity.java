@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         loadModelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoadModelActivity.class);
                 startActivity(intent);
             }
         });

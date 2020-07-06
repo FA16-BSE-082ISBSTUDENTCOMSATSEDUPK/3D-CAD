@@ -17,6 +17,12 @@ public class Windows {
 
     public static JSONArray windowDetection(Mat originalImage) throws JSONException {
 
+        //Fields to reduce redundency
+        Point oldStartingPoint = new Point(0,0);
+        Point oldEndingPoint = new Point(0, 0);
+        float oldAngle = (float) 0.00;
+        double oldLength = 0.0;
+
         Mat greyMat = new Mat();
         Mat edgeMat = new Mat();
 
@@ -65,6 +71,38 @@ public class Windows {
             float angle = (float) atan2(pt1.y - pt2.y, pt1.x - pt2.x);
 
             double windowLength = GetingMeasurements.getLinesLength(pt1, pt2);
+
+
+            //Check and remove Redundency start
+
+            if(checks.similarPoints(oldStartingPoint, pt1)){
+                if(checks.similarPoints(oldEndingPoint, pt2)){
+                    if(checks.similarAngles(oldAngle, angle)){
+                        if(checks.similarLength(oldLength, windowLength)){
+                            //Do whatever if walls are similar
+
+                            Log.d("Testing Redundent:   ", "True" );
+                            //Update Old values to New Values
+                            oldStartingPoint = pt1;
+                            oldEndingPoint = pt2;
+                            oldAngle = angle;
+                            oldLength = windowLength;
+
+//                            i++;
+//                            continue;
+
+
+                        }
+                    }
+                }
+            };
+
+            //Update Old values to New Values
+            oldStartingPoint = pt1;
+            oldEndingPoint = pt2;
+            oldAngle = angle;
+            oldLength = windowLength;
+
 
             window.put("StartingPoint", pt1.x + "," + pt1.y);
             window.put("EndingPoint", pt2.x + "," + pt2.y);
