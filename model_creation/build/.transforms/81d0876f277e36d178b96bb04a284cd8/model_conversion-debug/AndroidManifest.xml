@@ -7,7 +7,7 @@
     android:versionName="0.1" >
 
     <uses-sdk
-        android:minSdkVersion="18"
+        android:minSdkVersion="16"
         android:targetSdkVersion="29" />
 
     <supports-screens
@@ -44,7 +44,7 @@
             android:hardwareAccelerated="false"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:screenOrientation="reverseLandscape" >
+            android:screenOrientation="landscape" >
             <meta-data
                 android:name="unityplayer.UnityActivity"
                 android:value="true" />
@@ -52,7 +52,7 @@
 
         <meta-data
             android:name="unity.build-id"
-            android:value="3250d85f-8f0e-43b9-b4af-32983d80aa09" />
+            android:value="a69ff08f-c788-4a9e-814d-672e258da37d" />
         <meta-data
             android:name="unity.splash-mode"
             android:value="0" />

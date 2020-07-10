@@ -59,7 +59,7 @@ public class Walls {
         Imgproc.Canny(greyMat, edgeMat, 80, 100);// Edge detection
         // Probabilistic Line Transform
         Mat linesP = new Mat(); // will hold the results of the detection
-        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 20, 10, 10);
+        Imgproc.HoughLinesP(edgeMat, linesP, 1, Math.PI / 180, 40, 10, 10);
 
         double[] data;
         Point pt1 = new Point();
