@@ -2,6 +2,8 @@ package com.example.integratedapp;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -87,10 +89,27 @@ public class MainActivity extends AppCompatActivity {
                 };
 
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Confirm 2D Design !");
+                builder.setMessage("Are you sure to create 3D Model ?");
+                builder.setCancelable(false);
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
+                        startActivity(intent);                    }
+                });
+
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.show();
 
 
-                Intent intent = new Intent(MainActivity.this, OpenModelActivity.class);
-                startActivity(intent);
+
             }
         });
 
@@ -213,6 +232,18 @@ public class MainActivity extends AppCompatActivity {
         imageData.put("Walls", wallArray);
         imageData.put("Doors", doorArray);
         imageData.put("Windows", windowArray);
+
+        if(doorArray.length()==0 || windowArray.length()==0 || wallArray.length()==0){
+
+            JSONArray linesArray = Lines.lineDetection(originalImage);
+            imageData.remove("Walls");
+            imageData.remove("Doors");
+            imageData.remove("Windows");
+
+            imageData.put("Walls", linesArray);
+        }
+
+
 
 
 
