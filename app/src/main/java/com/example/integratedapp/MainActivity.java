@@ -225,25 +225,27 @@ public class MainActivity extends AppCompatActivity {
 
 
         imageData = new JSONObject();
-        JSONArray wallArray = Walls.wallDetection(originalImage);
+
         JSONArray doorArray = Doors.doorDetection(originalImage);
         JSONArray windowArray = Windows.windowDetection(originalImage);
+        JSONArray wallArray = new JSONArray();
+
+        if(doorArray.length()!=0 || windowArray.length()!=0){
+            wallArray = Walls.wallDetection(originalImage);
+        }
+
+
+
+
+        if(doorArray.length()==0 || windowArray.length()==0 || wallArray.length()==0){
+            JSONArray linesArray = Lines.lineDetection(originalImage);
+                wallArray = linesArray;
+        }
+
 
         imageData.put("Walls", wallArray);
         imageData.put("Doors", doorArray);
         imageData.put("Windows", windowArray);
-
-        if(doorArray.length()==0 || windowArray.length()==0 || wallArray.length()==0){
-
-            JSONArray linesArray = Lines.lineDetection(originalImage);
-            imageData.remove("Walls");
-            imageData.remove("Doors");
-            imageData.remove("Windows");
-
-            imageData.put("Walls", linesArray);
-        }
-
-
 
 
 
