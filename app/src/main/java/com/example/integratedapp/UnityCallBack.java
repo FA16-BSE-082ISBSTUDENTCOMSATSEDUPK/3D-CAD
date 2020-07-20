@@ -28,9 +28,9 @@ public class UnityCallBack {
         UnityCallBack.jsonString = jsonString;
     }
 
-    public static void setUseDummyValues(boolean useDummyValues){
-        UnityCallBack.useDummyValues = useDummyValues;
-    }
+//    public static void setUseDummyValues(boolean useDummyValues){
+//        UnityCallBack.useDummyValues = useDummyValues;
+//    }
 
     public static void setModelLoadScene(boolean modelLoadScene){
         UnityCallBack.modelLoadScene = modelLoadScene;

@@ -5,7 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.ciit.modelconversion.UnityPlayerActivity;
+import com.unity3d.player.UnityPlayerActivity;
+
 
 public class OpenModelActivity extends AppCompatActivity {
 
@@ -15,7 +16,7 @@ public class OpenModelActivity extends AppCompatActivity {
         setContentView(R.layout.activity_open_model);
 
 
-        UnityCallBack.getInstance().setUseDummyValues(false);
+
         UnityCallBack.getInstance().setModelLoadScene(false);
         Intent intent = new Intent(OpenModelActivity.this, UnityPlayerActivity.class);
         startActivity(intent);
